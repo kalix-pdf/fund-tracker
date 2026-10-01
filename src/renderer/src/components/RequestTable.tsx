@@ -6,12 +6,14 @@ import { useRequests } from '../api/api'
 import { StatusActions } from './StatusActions'
 import { CompleteDialog } from './CompleteDialog'
 import { StatusBadge } from './StatusBadge'
+import { RequestDetailsDrawer } from './RequestDetailsDrawer'
 
 export function RequestTable(): React.JSX.Element {
   const [filters, setFilters] = useState<ListQuery>({})
   const [completing, setCompleting] = useState<RequestRow | null>(null)
   const { data = [], isLoading, error } = useRequests(filters)
-  // console.log('RequestTable data:', data) // Debugging line to check the data being fetched
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const selected = data.find((r) => r.id === selectedId) ?? null
 
   return (
     <section className="card table-card" aria-labelledby="requests-title">
@@ -48,6 +50,7 @@ export function RequestTable(): React.JSX.Element {
           <table className="table">
             <thead>
               <tr>
+                <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Department</th>
                 <th scope="col">Purpose</th>
@@ -61,6 +64,12 @@ export function RequestTable(): React.JSX.Element {
             <tbody>
               {data.map((r) => (
                 <tr key={r.id}>
+                  <td className="cell-primary">
+                    <button type="button" className="btn btn--secondary"
+                      onClick={() => setSelectedId(r.id)} aria-label={`View details for ${r.requesterName}`}
+                    > View
+                    </button>
+                  </td>
                   <td className="cell-primary">{r.requesterName}</td>
                   <td>{r.department}</td>
                   <td className="cell-purpose" title={r.purpose}>
@@ -71,10 +80,16 @@ export function RequestTable(): React.JSX.Element {
                     <div className="status-cell">
                       <StatusBadge status={r.status} />
                       {r.reimbursementStatus === 'PENDING' && (
-                        <span className="tag">Reimbursement pending: {formatPesos(r.settlementCentavos)}</span>
+                        <span className="tag tag--warning">Reimbursement pending: {formatPesos(r.settlementCentavos)}</span>
                       )}
                       {r.reimbursementStatus === 'PAID' && (
                         <span className="tag tag--success">Paid / Reimbursed: {formatPesos(r.settlementCentavos)}</span>
+                      )}
+                      {r.refundStatus === 'PENDING' && (
+                        <span className="tag-feedback">Refund pending: {formatPesos(r.settlementCentavos)}</span>
+                      )}
+                      {r.refundStatus === 'REFUNDED' && (
+                        <span className="tag-feedback">Refunded: {formatPesos(r.settlementCentavos)}</span>
                       )}
                     </div>
                   </td>
@@ -98,6 +113,7 @@ export function RequestTable(): React.JSX.Element {
         )}
       </div>
 
+      {selected && <RequestDetailsDrawer request={selected} onClose={() => setSelectedId(null)} />}
       {completing && <CompleteDialog request={completing} onClose={() => setCompleting(null)} />}
     </section>
   )

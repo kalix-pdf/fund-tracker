@@ -11,9 +11,11 @@ export const listQuerySchema = z.object({
   search: z.string().trim().optional(),
   status: z.enum(STATUSES).optional(),
   department: z.enum(DEPARTMENTS).optional(),
-  reimbursementStatus: z.enum(['PENDING', 'PAID']).optional()
+  reimbursementStatus: z.enum(['PENDING', 'PAID']).optional(),
+  refundStatus: z.enum(['PENDING', 'REFUNDED']).optional()
 })
 export const markReimbursedSchema = z.object({ id: z.number().int().positive() })
+export const markRefundedSchema = z.object({ id: z.number().int().positive() })
 
 export const advanceSchema = z.object({
   id: z.number().int(),

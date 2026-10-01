@@ -11,7 +11,8 @@ const api = {
       ipcRenderer.invoke('requests:advance', { id, to }),
     complete: (id: number, liquidatedCentavos: number) =>
       ipcRenderer.invoke('requests:complete', { id, liquidatedCentavos }),
-    markReimbursed: (id: number) => ipcRenderer.invoke('requests:markReimbursed', id)
+    markReimbursed: (id: number) => ipcRenderer.invoke('requests:markReimbursed', id),
+    markRefunded: (id: number) => ipcRenderer.invoke('requests:markRefunded', id)
   }
 }
 

@@ -1,5 +1,5 @@
 import type { RequestRow } from '../../../shared/domain/request'
-import { useAdvanceRequest, useMarkReimbursed } from '../api/api'
+import { useAdvanceRequest, useMarkReimbursed, useMarkRefunded } from '../api/api'
 
 interface Props {
   request: RequestRow
@@ -9,6 +9,7 @@ interface Props {
 export function StatusActions({ request, onComplete }: Props): React.JSX.Element | null {
   const advance = useAdvanceRequest()
   const markReimbursed = useMarkReimbursed()
+  const markRefunded = useMarkRefunded()
 
   if (request.status === 'PENDING_APPROVAL') {
     return (
@@ -34,6 +35,14 @@ export function StatusActions({ request, onComplete }: Props): React.JSX.Element
     return (
       <button disabled={markReimbursed.isPending} onClick={() => markReimbursed.mutate(request.id)}>
         {markReimbursed.isPending ? 'Saving...' : 'Mark as reimbursed'}
+      </button>
+    )
+  }
+
+  if (request.refundStatus === 'PENDING') {
+    return (
+      <button disabled={markRefunded.isPending} onClick={() => markRefunded.mutate(request.id)}>
+        {markRefunded.isPending ? 'Saving...' : 'Mark as refunded'}
       </button>
     )
   }

@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron'
 import type { RequestService } from '../services/request.service'
 import type { RequestRepository } from '../repositories/request.repository'
-import { advanceSchema, completeSchema, createRequestSchema, listQuerySchema, markReimbursedSchema } from '../../shared/schema'
+import { advanceSchema, completeSchema, createRequestSchema, listQuerySchema, markRefundedSchema, markReimbursedSchema } from '../../shared/schema'
 
 export function registerRequestHandlers(repo: RequestRepository, svc: RequestService) {
   ipcMain.handle('requests:list', (_e, q) => repo.list(listQuerySchema.parse(q ?? {})))
@@ -16,5 +16,8 @@ export function registerRequestHandlers(repo: RequestRepository, svc: RequestSer
   })
   ipcMain.handle('requests:markReimbursed', (_e, id: unknown) =>
     svc.markReimbursed(markReimbursedSchema.parse({ id }).id)
+  )
+  ipcMain.handle('requests:markRefunded', (_e, id: unknown) =>
+    svc.markRefunded(markRefundedSchema.parse({ id }).id)
   )
 }

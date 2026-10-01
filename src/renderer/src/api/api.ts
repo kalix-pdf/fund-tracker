@@ -51,3 +51,11 @@ export function useMarkReimbursed() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: requestKeys.all })
   })
 }
+
+export function useMarkRefunded() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => window.api.requests.markRefunded(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: requestKeys.all })
+  })
+}

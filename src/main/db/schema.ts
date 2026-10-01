@@ -1,5 +1,5 @@
 import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core'
-import { DEPARTMENTS, STATUSES } from '../../shared/domain/status'
+import { DEPARTMENTS, STATUSES, REIMBURSEMENT_STATUSES, REFUND_STATUSES } from '../../shared/domain/status'
 
 export const requests = sqliteTable(
   'requests',
@@ -12,12 +12,14 @@ export const requests = sqliteTable(
     status: text('status', { enum: STATUSES }).notNull().default('PENDING_APPROVAL'),
     liquidatedCentavos: integer('liquidated_centavos'),
     settlementCentavos: integer('settlement_centavos'), // + reimburse, - refund owed
-    reimbursementStatus: text('reimbursement_status', { enum: ['PENDING', 'PAID'] }),
+    reimbursementStatus: text('reimbursement_status', { enum: REIMBURSEMENT_STATUSES }),
+    refundStatus: text('refund_status', { enum: REFUND_STATUSES }),
     createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
     approvedAt: integer('approved_at', { mode: 'timestamp' }),
     releasedAt: integer('released_at', { mode: 'timestamp' }),
     completedAt: integer('completed_at', { mode: 'timestamp' }),
-    reimbursedAt: integer('reimbursed_at', { mode: 'timestamp' })
+    reimbursedAt: integer('reimbursed_at', { mode: 'timestamp' }),
+    refundedAt: integer('refunded_at', { mode: 'timestamp' }),
   },
   (t) => [index('idx_requests_status').on(t.status), index('idx_requests_department').on(t.department)]
 )

@@ -29,7 +29,7 @@ export class RequestService {
       status: 'COMPLETED',
       completedAt: new Date(),
       liquidatedCentavos,
-      ...computeSettlement(r.amountCentavos, liquidatedCentavos)
+      ...computeSettlement(r.amountCentavos, liquidatedCentavos),
     })
   }
 
@@ -39,5 +39,13 @@ export class RequestService {
       throw new Error(`Request ${id} has no pending reimbursement`)
     }
     return this.repo.update(id, { reimbursementStatus: 'PAID', reimbursedAt: new Date() })
+  }
+
+  markRefunded(id: number) {
+    const r = this.require(id)
+    if (r.refundStatus !== 'PENDING') {
+      throw new Error(`Request ${id} has no pending refund`)
+    }
+    return this.repo.update(id, { refundStatus: 'REFUNDED', refundedAt: new Date() })
   }
 }

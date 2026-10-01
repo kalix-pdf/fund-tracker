@@ -10,8 +10,11 @@ export interface RequestRow {
   liquidatedCentavos: number | null
   settlementCentavos: number | null
   reimbursementStatus: 'PENDING' | 'PAID' | null
+  refundStatus: 'PENDING' | 'REFUNDED' | null
   createdAt: Date
   approvedAt: Date | null
   releasedAt: Date | null
   completedAt: Date | null
+  reimbursedAt: Date | null
+  refundedAt: Date | null
 }
