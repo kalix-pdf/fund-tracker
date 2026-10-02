@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, type SQL } from 'drizzle-orm'
+import { and, desc, eq, like, or, type SQL, count, sql } from 'drizzle-orm'
 import type { Db } from '../db/client'
 import { requests } from '../db/schema'
 import type { CreateRequestInput, ListQuery } from '../../shared/schema'
@@ -33,5 +33,33 @@ export class RequestRepository {
 
   update(id: number, patch: Partial<typeof requests.$inferInsert>) {
     return this.db.update(requests).set(patch).where(eq(requests.id, id)).returning().get()
+  }
+
+  summarizeByStatus() {
+    return this.db
+      .select({
+        status: requests.status,
+        count: count(),
+        amountCentavos: sql<number>`coalesce(sum(${requests.amountCentavos}), 0)`,
+        liquidatedCentavos: sql<number>`coalesce(sum(${requests.liquidatedCentavos}), 0)`,
+      })
+      .from(requests)
+      .groupBy(requests.status)
+      .all()
+  }
+
+  summarizeSettlements() {
+    const pendingReimb = sql`${requests.reimbursementStatus} = 'PENDING'`
+    const pendingRefund = sql`${requests.refundStatus} = 'PENDING'`
+
+    return this.db
+      .select({
+        reimbursementCount: sql<number>`coalesce(sum(case when ${pendingReimb} then 1 else 0 end), 0)`,
+        reimbursementCentavos: sql<number>`coalesce(sum(case when ${pendingReimb} then ${requests.settlementCentavos} else 0 end), 0)`,
+        refundCount: sql<number>`coalesce(sum(case when ${pendingRefund} then 1 else 0 end), 0)`,
+        refundCentavos: sql<number>`coalesce(sum(case when ${pendingRefund} then -${requests.settlementCentavos} else 0 end), 0)`,
+      })
+      .from(requests)
+      .get()!
   }
 }

@@ -3,7 +3,15 @@ import type { CreateRequestInput, ListQuery } from '../../../shared/schema'
 
 export const requestKeys = {
   all: ['requests'] as const,
-  list: (filters: ListQuery) => ['requests', 'list', filters] as const
+  list: (filters: ListQuery) => [...requestKeys.all, 'list', filters] as const,
+  summary: () => [...requestKeys.all, 'summary'] as const
+}
+
+export function useDashboardSummary() {
+  return useQuery({
+    queryKey: requestKeys.summary(),
+    queryFn: () => window.api.requests.dashboardSummary()
+  })
 }
 
 export function useRequests(filters: ListQuery) {

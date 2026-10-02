@@ -2,7 +2,11 @@ import { useId, useState, type FormEvent } from 'react'
 import { DEPARTMENTS, type Department } from '../../../shared/domain/status'
 import { useCreateRequest } from '../api/api'
 
-export function RequestForm(): React.JSX.Element {
+interface RequestFormProps {
+  onSubmitted: () => void
+}
+
+export function RequestForm({ onSubmitted }: RequestFormProps): React.JSX.Element {
   const [requesterName, setRequesterName] = useState('')
   const [department, setDepartment] = useState<Department>(DEPARTMENTS[0])
   const [purpose, setPurpose] = useState('')
@@ -29,6 +33,7 @@ export function RequestForm(): React.JSX.Element {
           setRequesterName('')
           setPurpose('')
           setAmountPesos('')
+          onSubmitted()
         }
       }
     )

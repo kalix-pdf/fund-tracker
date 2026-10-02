@@ -20,4 +20,5 @@ export function registerRequestHandlers(repo: RequestRepository, svc: RequestSer
   ipcMain.handle('requests:markRefunded', (_e, id: unknown) =>
     svc.markRefunded(markRefundedSchema.parse({ id }).id)
   )
+  ipcMain.handle('requests:dashboardSummary', () => svc.getDashboardSummary())
 }

@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
 import type { RequestRow } from '../../../shared/domain/request'
 import { formatPesos } from '../../../shared/domain/money'
+import { Drawer } from './Drawer'
 import { StatusBadge } from './StatusBadge'
 
 interface Props {
   request: RequestRow
+  open: boolean
   onClose: () => void
 }
 
@@ -24,15 +25,7 @@ function describeSettlement(r: RequestRow): { label: string; tone: 'warning' | '
   return { label: 'Fully liquidated, no balance', tone: 'success' }
 }
 
-export function RequestDetailsDrawer({ request: r, onClose }: Props): React.JSX.Element {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
+export function RequestDetailsDrawer({ request: r, open, onClose }: Props): React.JSX.Element {
   const settlement = describeSettlement(r)
 
   const timeline: Array<[string, Date | null]> = [
@@ -45,62 +38,44 @@ export function RequestDetailsDrawer({ request: r, onClose }: Props): React.JSX.
   ]
 
   return (
-    <div className="drawer-overlay" onClick={onClose}>
-      <aside
-        className="drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="drawer-title"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <header className="drawer__header">
-          <div>
-            <h3 id="drawer-title">Request #{r.id}</h3>
-            <StatusBadge status={r.status} />
-          </div>
-          <button type="button" className="drawer__close" onClick={onClose} aria-label="Close details">
-            ✕
-          </button>
-        </header>
+    <Drawer open={open} title={`Request #${r.id}`} meta={<StatusBadge status={r.status} />} onClose={onClose}>
+      <section className="drawer__section">
+        <h4>Request</h4>
+        <dl className="detail-list">
+          <dt>Requester</dt>
+          <dd>{r.requesterName}</dd>
+          <dt>Department</dt>
+          <dd>{r.department}</dd>
+          <dt>Purpose</dt>
+          <dd className="detail-list__multiline">{r.purpose}</dd>
+        </dl>
+      </section>
 
-        <section className="drawer__section">
-          <h4>Request</h4>
-          <dl className="detail-list">
-            <dt>Requester</dt>
-            <dd>{r.requesterName}</dd>
-            <dt>Department</dt>
-            <dd>{r.department}</dd>
-            <dt>Purpose</dt>
-            <dd className="detail-list__multiline">{r.purpose}</dd>
-          </dl>
-        </section>
+      <section className="drawer__section">
+        <h4>Amounts</h4>
+        <dl className="detail-list">
+          <dt>Released</dt>
+          <dd>{formatPesos(r.amountCentavos)}</dd>
+          <dt>Liquidated (receipts)</dt>
+          <dd>{r.liquidatedCentavos === null ? '—' : formatPesos(r.liquidatedCentavos)}</dd>
+          <dt>Balance</dt>
+          <dd>
+            <span className={`tag tag--${settlement.tone}`}>{settlement.label}</span>
+          </dd>
+        </dl>
+      </section>
 
-        <section className="drawer__section">
-          <h4>Amounts</h4>
-          <dl className="detail-list">
-            <dt>Released</dt>
-            <dd>{formatPesos(r.amountCentavos)}</dd>
-            <dt>Liquidated (receipts)</dt>
-            <dd>{r.liquidatedCentavos === null ? '—' : formatPesos(r.liquidatedCentavos)}</dd>
-            <dt>Balance</dt>
-            <dd>
-              <span className={`tag tag--${settlement.tone}`}>{settlement.label}</span>
-            </dd>
-          </dl>
-        </section>
-
-        <section className="drawer__section">
-          <h4>Timeline</h4>
-          <ol className="timeline">
-            {timeline.map(([label, date]) => (
-              <li key={label} className={date ? 'timeline__item is-done' : 'timeline__item'}>
-                <span>{label}</span>
-                <time>{formatDate(date)}</time>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </aside>
-    </div>
+      <section className="drawer__section">
+        <h4>Timeline</h4>
+        <ol className="timeline">
+          {timeline.map(([label, date]) => (
+            <li key={label} className={date ? 'timeline__item is-done' : 'timeline__item'}>
+              <span>{label}</span>
+              <time>{formatDate(date)}</time>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </Drawer>
   )
 }

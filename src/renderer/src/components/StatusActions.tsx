@@ -13,7 +13,7 @@ export function StatusActions({ request, onComplete }: Props): React.JSX.Element
 
   if (request.status === 'PENDING_APPROVAL') {
     return (
-      <button disabled={advance.isPending} onClick={() => advance.mutate({ id: request.id, to: 'APPROVED' })}>
+      <button className='btn-action tag--neutral' disabled={advance.isPending} onClick={() => advance.mutate({ id: request.id, to: 'APPROVED' })}>
         Approve
       </button>
     )
@@ -21,19 +21,19 @@ export function StatusActions({ request, onComplete }: Props): React.JSX.Element
 
   if (request.status === 'APPROVED') {
     return (
-      <button disabled={advance.isPending} onClick={() => advance.mutate({ id: request.id, to: 'RELEASED' })}>
+      <button className='btn-action tag--neutral' disabled={advance.isPending} onClick={() => advance.mutate({ id: request.id, to: 'RELEASED' })}>
         Release
       </button>
     )
   }
 
   if (request.status === 'RELEASED') {
-    return <button onClick={() => onComplete(request)}>Complete</button>
+    return <button className='btn-action tag--warning' onClick={() => onComplete(request)}>Complete</button>
   }
 
   if (request.reimbursementStatus === 'PENDING') {
     return (
-      <button disabled={markReimbursed.isPending} onClick={() => markReimbursed.mutate(request.id)}>
+      <button className='btn-action tag--success' disabled={markReimbursed.isPending} onClick={() => markReimbursed.mutate(request.id)}>
         {markReimbursed.isPending ? 'Saving...' : 'Mark as reimbursed'}
       </button>
     )
@@ -41,7 +41,7 @@ export function StatusActions({ request, onComplete }: Props): React.JSX.Element
 
   if (request.refundStatus === 'PENDING') {
     return (
-      <button disabled={markRefunded.isPending} onClick={() => markRefunded.mutate(request.id)}>
+      <button className='btn-action tag--success' disabled={markRefunded.isPending} onClick={() => markRefunded.mutate(request.id)}>
         {markRefunded.isPending ? 'Saving...' : 'Mark as refunded'}
       </button>
     )

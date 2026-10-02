@@ -12,7 +12,8 @@ const api = {
     complete: (id: number, liquidatedCentavos: number) =>
       ipcRenderer.invoke('requests:complete', { id, liquidatedCentavos }),
     markReimbursed: (id: number) => ipcRenderer.invoke('requests:markReimbursed', id),
-    markRefunded: (id: number) => ipcRenderer.invoke('requests:markRefunded', id)
+    markRefunded: (id: number) => ipcRenderer.invoke('requests:markRefunded', id),
+    dashboardSummary: () => ipcRenderer.invoke('requests:dashboardSummary'),
   }
 }
 

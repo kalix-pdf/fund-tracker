@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { ListQuery } from '../../../shared/schema'
 import type { RequestRow } from '../../../shared/domain/request'
 import { formatPesos } from '../../../shared/domain/money'
@@ -12,8 +12,17 @@ export function RequestTable(): React.JSX.Element {
   const [filters, setFilters] = useState<ListQuery>({})
   const [completing, setCompleting] = useState<RequestRow | null>(null)
   const { data = [], isLoading, error } = useRequests(filters)
+  
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const selected = data.find((r) => r.id === selectedId) ?? null
+
+  const openDetails = (id:number) => {
+    setSelectedId(id)
+    setDetailsOpen(true)
+  }
+
+  // const closeDetails = useCallback(() => setDetailsOpen(false), [])
 
   return (
     <section className="card table-card" aria-labelledby="requests-title">
@@ -57,7 +66,7 @@ export function RequestTable(): React.JSX.Element {
                 <th scope="col" className="num">
                   Amount
                 </th>
-                <th scope="col">Status</th>
+                <th scope="col" className='status'>Status</th>
                 <th scope="col">Action</th>
               </tr>
             </thead>
@@ -66,14 +75,16 @@ export function RequestTable(): React.JSX.Element {
                 <tr key={r.id}>
                   <td className="cell-primary">
                     <button type="button" className="btn btn--secondary"
-                      onClick={() => setSelectedId(r.id)} aria-label={`View details for ${r.requesterName}`}
+                      onClick={() => openDetails(r.id)} aria-label={`View details for ${r.requesterName}`}
                     > View
                     </button>
                   </td>
                   <td className="cell-primary">{r.requesterName}</td>
                   <td>{r.department}</td>
-                  <td className="cell-purpose" title={r.purpose}>
-                    {r.purpose}
+                  <td className="cell-purpose">
+                    <div className="cell-purpose__text" title={r.purpose}>
+                      {r.purpose}
+                    </div>
                   </td>
                   <td className="num">{formatPesos(r.amountCentavos)}</td>
                   <td>
@@ -86,10 +97,10 @@ export function RequestTable(): React.JSX.Element {
                         <span className="tag tag--success">Paid / Reimbursed: {formatPesos(r.settlementCentavos)}</span>
                       )}
                       {r.refundStatus === 'PENDING' && (
-                        <span className="tag-feedback">Refund pending: {formatPesos(r.settlementCentavos)}</span>
+                        <span className="tag tag--warning">Refund pending: {formatPesos(r.settlementCentavos)}</span>
                       )}
                       {r.refundStatus === 'REFUNDED' && (
-                        <span className="tag-feedback">Refunded: {formatPesos(r.settlementCentavos)}</span>
+                        <span className="tag tag--success">Refunded: {formatPesos(r.settlementCentavos)}</span>
                       )}
                     </div>
                   </td>
@@ -113,7 +124,9 @@ export function RequestTable(): React.JSX.Element {
         )}
       </div>
 
-      {selected && <RequestDetailsDrawer request={selected} onClose={() => setSelectedId(null)} />}
+      {selected && (
+        <RequestDetailsDrawer request={selected} open={detailsOpen} onClose={() => setSelectedId(null)} />
+      )}
       {completing && <CompleteDialog request={completing} onClose={() => setCompleting(null)} />}
     </section>
   )

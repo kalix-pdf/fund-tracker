@@ -1,6 +1,7 @@
 import { canAdvance, type Status } from '../../shared/domain/status'
 import type { RequestRepository } from '../repositories/request.repository'
 import { computeSettlement } from '../../shared/domain/settlement'
+import type { DashboardSummary } from '../../shared/domain/dashboard'
 
 export class RequestService {
   constructor(private repo: RequestRepository) {}
@@ -47,5 +48,36 @@ export class RequestService {
       throw new Error(`Request ${id} has no pending refund`)
     }
     return this.repo.update(id, { refundStatus: 'REFUNDED', refundedAt: new Date() })
+  }
+  getDashboardSummary(): DashboardSummary {
+    const rows = this.repo.summarizeByStatus()
+    const totals = (status: Status) => {
+      const row = rows.find((r) => r.status === status)
+      return {
+        count: row?.count ?? 0,
+        amountCentavos: row?.amountCentavos ?? 0,
+        liquidatedCentavos: row?.liquidatedCentavos ?? 0,
+      }
+    }
+
+    const pending = totals('PENDING_APPROVAL')
+    const approved = totals('APPROVED')
+    const released = totals('RELEASED')
+    const completed = totals('COMPLETED')
+    const s = this.repo.summarizeSettlements()
+
+    return {
+      pendingApproval: { count: pending.count, amountCentavos: pending.amountCentavos },
+      approved: { count: approved.count, amountCentavos: approved.amountCentavos },
+      forLiquidation: { count: released.count, amountCentavos: released.amountCentavos },
+      completed: {
+        count: completed.count,
+        amountCentavos: completed.amountCentavos,
+        liquidatedCentavos: completed.liquidatedCentavos,
+      },
+      totalReleasedCentavos: released.amountCentavos + completed.amountCentavos,
+      reimbursementOwed: { count: s.reimbursementCount, amountCentavos: s.reimbursementCentavos },
+      refundDue: { count: s.refundCount, amountCentavos: s.refundCentavos },
+    }
   }
 }
