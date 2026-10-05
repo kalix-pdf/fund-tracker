@@ -14,6 +14,10 @@ const api = {
     markReimbursed: (id: number) => ipcRenderer.invoke('requests:markReimbursed', id),
     markRefunded: (id: number) => ipcRenderer.invoke('requests:markRefunded', id),
     dashboardSummary: () => ipcRenderer.invoke('requests:dashboardSummary'),
+  },
+  window: {
+    enterApp: () => ipcRenderer.invoke('window:enter-app'),
+    enterLogin: () => ipcRenderer.invoke('window:enter-login')
   }
 }
 

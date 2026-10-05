@@ -4,14 +4,14 @@ import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import '@fontsource/poppins/700.css'
 import './styles/app.css'
-// import './styles/app-header.css'
 import { AppHeader } from './components/AppHeader'
 import { Dashboard } from './components/Dashboard'
 import { Drawer } from './components/Drawer'
+import { LoginPage } from './components/auth/LoginPage'
 import { RequestForm } from './components/RequestForm'
 import { RequestTable } from './components/RequestTable'
 
-function App(): React.JSX.Element {
+function MainShell(): React.JSX.Element {
   const [formOpen, setFormOpen] = useState(false)
   const closeForm = useCallback(() => setFormOpen(false), [])
 
@@ -48,6 +48,11 @@ function App(): React.JSX.Element {
       </main>
     </>
   )
+}
+
+function App(): React.JSX.Element {
+  // Fail closed: anything other than an explicit #main renders the login screen.
+  return window.location.hash === '#main' ? <MainShell /> : <LoginPage />
 }
 
 export default App
