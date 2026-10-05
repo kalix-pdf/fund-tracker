@@ -8,7 +8,7 @@ import { registerWindowHandlers } from './ipc/window.handlers'
 import { WindowManager } from './windows/window.manager'
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.totops.fund-tracker.app')
 
   const { db } = openDb()
   const repo = new RequestRepository(db)

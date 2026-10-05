@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: fund-tracker
+appId: com.totops.fund-tracker.app
+productName: Fund Tracker
 directories:
   buildResources: build
 files:
@@ -11,13 +11,17 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+  - node_modules/better-sqlite3/**
 win:
   executableName: fund-tracker
+  target: nsis
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
