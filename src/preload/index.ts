@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer  } from 'electron'
 // import { electronAPI } from '@electron-toolkit/preload'
 import type { CreateRequestInput, ListQuery } from '../shared/schema'
+import { CashMovement } from '../shared/domain/fund';
 
 // Custom APIs for renderer
 const api = {
@@ -25,6 +26,7 @@ const api = {
     add: (input: { forMonth: string; amountCentavos: number; note?: string }) =>
       ipcRenderer.invoke('funds:add', input),
     void: (id: number) => ipcRenderer.invoke('funds:void', { id }),
+    movements: (month: string): Promise<CashMovement[]> => ipcRenderer.invoke('funds:movements', { month }),
   }
 }
 

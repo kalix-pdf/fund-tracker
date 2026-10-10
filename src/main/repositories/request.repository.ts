@@ -2,6 +2,19 @@ import { and, desc, eq, like, or, type SQL, count, sql } from 'drizzle-orm'
 import type { Db } from '../db/client'
 import { requests } from '../db/schema'
 import type { CreateRequestInput, ListQuery } from '../../shared/schema'
+import type { CashMovement } from '../../shared/domain/fund'
+
+const toUnix = (d: Date) => Math.floor(d.getTime() / 1000)
+
+interface CashMovementRow {
+  request_id: number
+  type: CashMovement['type']
+  occurred_at: number
+  requester_name: string
+  department: string
+  purpose: string
+  amount: number
+}
 
 export class RequestRepository {
   constructor(private db: Db) {}
@@ -63,23 +76,51 @@ export class RequestRepository {
       .get()!
   }
 
-  // Net cash out between [from, to). Timestamps are stored as unix seconds.
-  cashOutBetween(from: Date, to: Date): number {
-    const f = Math.floor(from.getTime() / 1000)
-    const t = Math.floor(to.getTime() / 1000)
-
-    const row = this.db.get<{ net: number }>(sql`
-      SELECT
-        COALESCE(SUM(CASE WHEN ${requests.releasedAt} >= ${f} AND ${requests.releasedAt} < ${t}
-                          THEN ${requests.amountCentavos} END), 0)
-      + COALESCE(SUM(CASE WHEN ${requests.reimbursementStatus} = 'PAID'
-                          AND ${requests.reimbursedAt} >= ${f} AND ${requests.reimbursedAt} < ${t}
-                          THEN ${requests.settlementCentavos} END), 0)
-      - COALESCE(SUM(CASE WHEN ${requests.refundStatus} = 'REFUNDED'
-                          AND ${requests.refundedAt} >= ${f} AND ${requests.refundedAt} < ${t}
-                          THEN -${requests.settlementCentavos} END), 0) AS net
+  // One definition of "what counts as money moving", shared by the totals and the ledger table.
+  private movementsSql(from: Date, to: Date) {
+    const f = toUnix(from)
+    const t = toUnix(to)
+    return sql`
+      SELECT ${requests.id} AS request_id, 'RELEASE' AS type, ${requests.releasedAt} AS occurred_at,
+            ${requests.requesterName} AS requester_name, ${requests.department} AS department,
+            ${requests.purpose} AS purpose, ${requests.amountCentavos} AS amount
       FROM ${requests}
-    `)
+      WHERE ${requests.releasedAt} >= ${f} AND ${requests.releasedAt} < ${t}
+      UNION ALL
+      SELECT ${requests.id}, 'REIMBURSEMENT', ${requests.reimbursedAt},
+            ${requests.requesterName}, ${requests.department}, ${requests.purpose}, ${requests.settlementCentavos}
+      FROM ${requests}
+      WHERE ${requests.reimbursementStatus} = 'PAID'
+        AND ${requests.reimbursedAt} >= ${f} AND ${requests.reimbursedAt} < ${t}
+      UNION ALL
+      SELECT ${requests.id}, 'REFUND', ${requests.refundedAt},
+            ${requests.requesterName}, ${requests.department}, ${requests.purpose}, ${requests.settlementCentavos}
+      FROM ${requests}
+      WHERE ${requests.refundStatus} = 'REFUNDED'
+        AND ${requests.refundedAt} >= ${f} AND ${requests.refundedAt} < ${t}
+    `
+  }
+
+  cashOutBetween(from: Date, to: Date): number {
+    const row = this.db.get<{ net: number }>(
+      sql`SELECT COALESCE(SUM(amount), 0) AS net FROM (${this.movementsSql(from, to)})`
+    )
     return row?.net ?? 0
+  }
+
+  cashMovementsBetween(from: Date, to: Date): CashMovement[] {
+    const rows = this.db.all<CashMovementRow>(sql`
+      SELECT * FROM (${this.movementsSql(from, to)})
+      ORDER BY occurred_at DESC, request_id DESC
+    `)
+    return rows.map((r) => ({
+      requestId: r.request_id,
+      type: r.type,
+      occurredAt: new Date(r.occurred_at * 1000),
+      requesterName: r.requester_name,
+      department: r.department,
+      purpose: r.purpose,
+      amountCentavos: r.amount,
+    }))
   }
 }

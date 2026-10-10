@@ -1043,3 +1043,12 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* funds movements table */
+.badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+.badge--release { background: #fff1e6; color: #b45309; }
+.badge--reimbursement { background: #e8f0fe; color: #1d4ed8; }
+.badge--refund { background: #e6f6ec; color: #15803d; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.num--in { color: #15803d; }
+.empty { text-align: center; color: #6b7280; }

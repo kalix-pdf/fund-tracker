@@ -26,3 +26,17 @@ export interface FundAddition {
   note?: string
   createdAt: string
 }
+
+export const CASH_MOVEMENT_TYPES = ['RELEASE', 'REIMBURSEMENT', 'REFUND'] as const
+export type CashMovementType = (typeof CASH_MOVEMENT_TYPES)[number]
+
+export interface CashMovement {
+  requestId: number
+  type: CashMovementType
+  occurredAt: Date
+  requesterName: string
+  department: string
+  purpose: string
+  /** Positive = cash out, negative = cash back in (refund received). */
+  amountCentavos: number
+}

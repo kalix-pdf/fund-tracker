@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useMonthlyFunds } from '../hooks/useMonthlyFunds'
 import { currentMonthKey, nextMonthKey } from '../lib/month'
 import { formatCentavos, pesosToCentavos } from '../lib/money'
+import { CashMovementsTable } from './CashMovementsTable'
 
 export function FundsDashboard(): React.JSX.Element {
   const [month, setMonth] = useState(currentMonthKey)
-  const { summary, additions, error, refresh } = useMonthlyFunds(month)
+  const { summary, additions, movements, error, refresh } = useMonthlyFunds(month)
 
   const [forMonth, setForMonth] = useState(nextMonthKey)
   const [amount, setAmount] = useState('')
@@ -44,7 +45,7 @@ export function FundsDashboard(): React.JSX.Element {
 
       {summary && (
         <div className="funds__cards">
-          <Stat label="Cash Released" value={summary.carriedOverCentavos} />
+          <Stat label="Cash Released" value={summary.expensesCentavos} />
           <Stat label="Funds added" value={summary.addedCentavos} />
           <Stat label="Total Cash Expenses" value={summary.expensesCentavos} />
           <Stat label="Remaining Cash" value={summary.remainingCentavos} emphasis />
@@ -73,6 +74,8 @@ export function FundsDashboard(): React.JSX.Element {
           ))}
         </tbody>
       </table>
+
+      <CashMovementsTable movements={movements} />
     </section>
   )
 }

@@ -10,4 +10,5 @@ export function registerFundHandlers(svc: FundService) {
     return svc.addFunds(forMonth, amountCentavos, note)
   })
   ipcMain.handle('funds:void', (_e, p) => svc.voidAddition(voidFundsSchema.parse(p).id))
+  ipcMain.handle('funds:movements', (_e, p) => svc.listCashMovements(fundsMonthSchema.parse(p).month))
 }

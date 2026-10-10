@@ -10,7 +10,7 @@ import { Drawer } from './components/Drawer'
 import { LoginPage } from './components/auth/LoginPage'
 import { RequestForm } from './components/RequestForm'
 import { RequestTable } from './components/RequestTable'
-import { Tabs } from './components/tabs'
+import { Tabs } from './components/Tabs'
 import { FundsDashboard } from './components/FundsDashboard'
 
 type View = 'requests' | 'funds'

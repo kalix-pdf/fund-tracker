@@ -1,4 +1,4 @@
-import { isMonthKey, monthRange, type MonthlyFundsSummary } from '../../shared/domain/fund'
+import { CashMovement, isMonthKey, monthRange, type MonthlyFundsSummary } from '../../shared/domain/fund'
 import { FundRepository } from '../repositories/fund.repository'
 import { RequestRepository } from '../repositories/request.repository'
 
@@ -37,5 +37,11 @@ export class FundService {
 
   voidAddition(id: number) {
     this.funds.void(id)
+  }
+
+  listCashMovements(month: string): CashMovement[] {
+    if (!isMonthKey(month)) throw new Error(`Invalid month: ${month}`)
+    const { start, end } = monthRange(month)
+    return this.requests.cashMovementsBetween(start, end)
   }
 }
