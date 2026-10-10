@@ -50,16 +50,16 @@ function MainShell(): React.JSX.Element {
 
         <Tabs tabs={[...VIEWS]} active={view} onChange={setView} />
 
-        <div className="app__body">
-          {view === 'requests' ? (
+        {view === 'funds' ? (
+            <FundsDashboard />
+        ) : (
+          <div className="app__body">
             <>
               <Dashboard />
               <RequestTable />
             </>
-          ) : (
-            <FundsDashboard />
-          )}
-        </div>
+          </div>
+        )}
 
         <Drawer open={formOpen} title="New fund request" onClose={closeForm}>
           <RequestForm onSubmitted={closeForm} />

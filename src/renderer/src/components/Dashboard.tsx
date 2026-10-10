@@ -1,5 +1,6 @@
 import { formatPesos } from '../../../shared/domain/money'
 import { useDashboardSummary } from '../api/api'
+import { Stat } from '../lib/stat'
 
 interface CardProps {
   label: string

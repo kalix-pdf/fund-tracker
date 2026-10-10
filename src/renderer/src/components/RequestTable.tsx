@@ -25,17 +25,13 @@ export function RequestTable(): React.JSX.Element {
   // const closeDetails = useCallback(() => setDetailsOpen(false), [])
 
   return (
-    <section className="card table-card" aria-labelledby="requests-title">
-      <header className="card__header">
-        <div>
-          <h2 className="card__title" id="requests-title">
-            Requests
-          </h2>
-          <p className="card__subtitle">
-            {isLoading ? 'Loading…' : `${data.length} ${data.length === 1 ? 'record' : 'records'}`}
-          </p>
-        </div>
-        <div className="toolbar">
+    <section className="cash-movements" aria-labelledby="requests-title">
+      <header className="cash-movements__head">
+        <h2 className="panel__title">Requests </h2>
+        <span className="cash-movements__count">
+          {data.length} {data.length === 1 ? 'entry' : 'entries'}
+        </span>
+         <div className="toolbar">
           <input
             className="input"
             type="search"
@@ -46,7 +42,7 @@ export function RequestTable(): React.JSX.Element {
         </div>
       </header>
 
-      <div className="table-scroll">
+      <div className="cash-movements__scroll">
         {error ? (
           <p className="state" role="alert">
             Failed to load requests.
@@ -56,37 +52,35 @@ export function RequestTable(): React.JSX.Element {
         ) : data.length === 0 ? (
           <p className="state">No requests found.</p>
         ) : (
-          <table className="table">
+          <table className="funds__table">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Department</th>
-                <th scope="col">Purpose</th>
-                <th scope="col" className="num">
-                  Amount
-                </th>
-                <th scope="col" className='status'>Status</th>
-                <th scope="col">Action</th>
+                <th>#</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Purpose</th>
+                <th>Amount</th>
+                <th className='status'>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {data.map((r) => (
                 <tr key={r.id}>
-                  <td className="cell-primary">
-                    <button type="button" className="btn btn--secondary"
+                  <td>
+                    <button type="button" className="btn-action tag--success"
                       onClick={() => openDetails(r.id)} aria-label={`View details for ${r.requesterName}`}
                     > View
                     </button>
                   </td>
-                  <td className="cell-primary">{r.requesterName}</td>
+                  <td>{r.requesterName}</td>
                   <td>{r.department}</td>
-                  <td className="cell-purpose">
+                  <td>
                     <div className="cell-purpose__text" title={r.purpose}>
                       {r.purpose}
                     </div>
                   </td>
-                  <td className="num">{formatPesos(r.amountCentavos)}</td>
+                  <td>{formatPesos(r.amountCentavos)}</td>
                   <td>
                     <div className="status-cell">
                       <StatusBadge status={r.status} />
