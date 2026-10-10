@@ -10,8 +10,17 @@ import { Drawer } from './components/Drawer'
 import { LoginPage } from './components/auth/LoginPage'
 import { RequestForm } from './components/RequestForm'
 import { RequestTable } from './components/RequestTable'
+import { Tabs } from './components/tabs'
+import { FundsDashboard } from './components/FundsDashboard'
+
+type View = 'requests' | 'funds'
+const VIEWS = [
+  { id: 'requests', label: 'Requests' },
+  { id: 'funds', label: 'Funds' },
+] as const satisfies readonly { id: View; label: string }[]
 
 function MainShell(): React.JSX.Element {
+  const [view, setView] = useState<View>('requests')
   const [formOpen, setFormOpen] = useState(false)
   const closeForm = useCallback(() => setFormOpen(false), [])
 
@@ -30,16 +39,26 @@ function MainShell(): React.JSX.Element {
             <h1>Fund Request Tracker</h1>
             <p>Log fund requests and track them through approval and liquidation.</p>
           </div>
-          <div className="app__header-actions">
-            <button type="button" className="btn btn--primary" onClick={() => setFormOpen(true)}>
-              + New request
-            </button>
-          </div>
+          {view === 'requests' && (
+            <div className="app__header-actions">
+              <button type="button" className="btn btn--primary" onClick={() => setFormOpen(true)}>
+                + New request
+              </button>
+            </div>
+          )}
         </div>
 
+        <Tabs tabs={[...VIEWS]} active={view} onChange={setView} />
+
         <div className="app__body">
-          <Dashboard />
-          <RequestTable />
+          {view === 'requests' ? (
+            <>
+              <Dashboard />
+              <RequestTable />
+            </>
+          ) : (
+            <FundsDashboard />
+          )}
         </div>
 
         <Drawer open={formOpen} title="New fund request" onClose={closeForm}>

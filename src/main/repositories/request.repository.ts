@@ -62,4 +62,24 @@ export class RequestRepository {
       .from(requests)
       .get()!
   }
+
+  // Net cash out between [from, to). Timestamps are stored as unix seconds.
+  cashOutBetween(from: Date, to: Date): number {
+    const f = Math.floor(from.getTime() / 1000)
+    const t = Math.floor(to.getTime() / 1000)
+
+    const row = this.db.get<{ net: number }>(sql`
+      SELECT
+        COALESCE(SUM(CASE WHEN ${requests.releasedAt} >= ${f} AND ${requests.releasedAt} < ${t}
+                          THEN ${requests.amountCentavos} END), 0)
+      + COALESCE(SUM(CASE WHEN ${requests.reimbursementStatus} = 'PAID'
+                          AND ${requests.reimbursedAt} >= ${f} AND ${requests.reimbursedAt} < ${t}
+                          THEN ${requests.settlementCentavos} END), 0)
+      - COALESCE(SUM(CASE WHEN ${requests.refundStatus} = 'REFUNDED'
+                          AND ${requests.refundedAt} >= ${f} AND ${requests.refundedAt} < ${t}
+                          THEN -${requests.settlementCentavos} END), 0) AS net
+      FROM ${requests}
+    `)
+    return row?.net ?? 0
+  }
 }

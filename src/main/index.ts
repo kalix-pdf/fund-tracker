@@ -6,6 +6,9 @@ import { RequestService } from './services/request.service'
 import { registerRequestHandlers } from './ipc/request.handlers'
 import { registerWindowHandlers } from './ipc/window.handlers'
 import { WindowManager } from './windows/window.manager'
+import { FundRepository } from './repositories/fund.repository'
+import { FundService } from './services/fund.service'
+import { registerFundHandlers } from './ipc/fund.handlers'
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.totops.fund-tracker.app')
@@ -16,6 +19,11 @@ app.whenReady().then(() => {
 
   registerRequestHandlers(repo, new RequestService(repo))
   registerWindowHandlers(windows)
+  
+  const fundRepo = new FundRepository(db)
+  const fundSvc = new FundService(fundRepo, repo)
+  // registerRequestHandlers(requestRepo, requestSvc)
+  registerFundHandlers(fundSvc)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

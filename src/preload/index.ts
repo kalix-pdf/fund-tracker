@@ -18,6 +18,13 @@ const api = {
   window: {
     enterApp: () => ipcRenderer.invoke('window:enter-app'),
     enterLogin: () => ipcRenderer.invoke('window:enter-login')
+  },
+  funds: {
+    summary: (month: string) => ipcRenderer.invoke('funds:summary', { month }),
+    list: (month: string) => ipcRenderer.invoke('funds:list', { month }),
+    add: (input: { forMonth: string; amountCentavos: number; note?: string }) =>
+      ipcRenderer.invoke('funds:add', input),
+    void: (id: number) => ipcRenderer.invoke('funds:void', { id }),
   }
 }
 

@@ -1,4 +1,5 @@
-import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, integer, text, index, check } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
 import { DEPARTMENTS, STATUSES, REIMBURSEMENT_STATUSES, REFUND_STATUSES } from '../../shared/domain/status'
 
 export const requests = sqliteTable(
@@ -21,5 +22,25 @@ export const requests = sqliteTable(
     reimbursedAt: integer('reimbursed_at', { mode: 'timestamp' }),
     refundedAt: integer('refunded_at', { mode: 'timestamp' }),
   },
-  (t) => [index('idx_requests_status').on(t.status), index('idx_requests_department').on(t.department)]
+  (t) => [index('idx_requests_status').on(t.status), index('idx_requests_department').on(t.department),
+    index('idx_requests_released_at').on(t.releasedAt), index('idx_requests_reimbursed_at').on(t.reimbursedAt),
+    index('idx_requests_refunded_at').on(t.refundedAt)
+  ]
+)
+
+
+export const fundAdditions = sqliteTable(
+  'fund_additions',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    forMonth: text('for_month').notNull(), // 'YYYY-MM' budget month the money is for
+    amountCentavos: integer('amount_centavos').notNull(),
+    note: text('note'),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+    voidedAt: integer('voided_at', { mode: 'timestamp' }), // soft-delete, keeps audit trail
+  },
+  (t) => [
+    index('idx_fund_additions_month').on(t.forMonth),
+    check('chk_fund_amount_positive', sql`${t.amountCentavos} > 0`),
+  ]
 )

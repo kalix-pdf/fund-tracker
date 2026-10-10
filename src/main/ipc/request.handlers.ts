@@ -1,3 +1,4 @@
+// src/main/ipc/request.handlers.ts
 import { ipcMain } from 'electron'
 import type { RequestService } from '../services/request.service'
 import type { RequestRepository } from '../repositories/request.repository'

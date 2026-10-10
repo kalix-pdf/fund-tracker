@@ -28,3 +28,17 @@ export const completeSchema = z.object({
 
 export type CreateRequestInput = z.infer<typeof createRequestSchema>
 export type ListQuery = z.infer<typeof listQuerySchema>
+
+
+//add funds schema:
+export const monthKeySchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Expected YYYY-MM')
+
+export const fundsMonthSchema = z.object({ month: monthKeySchema })
+
+export const addFundsSchema = z.object({
+  forMonth: monthKeySchema,
+  amountCentavos: z.number().int().positive(),
+  note: z.string().trim().max(200).optional(),
+})
+
+export const voidFundsSchema = z.object({ id: z.number().int().positive() })

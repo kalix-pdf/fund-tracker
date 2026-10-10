@@ -15,6 +15,13 @@
       "when": 1790866236224,
       "tag": "0001_zippy_misty_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791550965655,
+      "tag": "0002_overjoyed_mandroid",
+      "breakpoints": true
     }
   ]
 }
