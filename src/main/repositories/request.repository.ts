@@ -83,7 +83,7 @@ export class RequestRepository {
     return sql`
       SELECT ${requests.id} AS request_id, 'RELEASE' AS type, ${requests.releasedAt} AS occurred_at,
             ${requests.requesterName} AS requester_name, ${requests.department} AS department,
-            ${requests.purpose} AS purpose, ${requests.amountCentavos} AS amount
+            ${requests.purpose} AS purpose, ${requests.liquidatedCentavos} AS amount
       FROM ${requests}
       WHERE ${requests.releasedAt} >= ${f} AND ${requests.releasedAt} < ${t}
       UNION ALL
@@ -103,7 +103,7 @@ export class RequestRepository {
 
   cashOutBetween(from: Date, to: Date): number {
     const row = this.db.get<{ net: number }>(
-      sql`SELECT COALESCE(SUM(amount), 0) AS net FROM (${this.movementsSql(from, to)})`
+      sql`SELECT COALESCE(SUM(amount), 0) AS net FROM (${this.movementsSql(from, to)}) WHERE type == 'RELEASE'`
     )
     return row?.net ?? 0
   }
@@ -113,6 +113,9 @@ export class RequestRepository {
       SELECT * FROM (${this.movementsSql(from, to)})
       ORDER BY occurred_at DESC, request_id DESC
     `)
+    const net = this.cashOutBetween(from, to)
+
+    // console.log(`Cash movements between ${from.toISOString()} and ${to.toISOString()}:`, rows, 'net:', net)
     return rows.map((r) => ({
       requestId: r.request_id,
       type: r.type,
@@ -121,6 +124,7 @@ export class RequestRepository {
       department: r.department,
       purpose: r.purpose,
       amountCentavos: r.amount,
+      net: net,
     }))
   }
 }

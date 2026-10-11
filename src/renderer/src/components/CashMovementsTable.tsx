@@ -10,7 +10,8 @@ const TYPE_LABEL: Record<CashMovementType, string> = {
 }
 
 export function CashMovementsTable({ movements }: { movements: CashMovement[] }): React.JSX.Element {
-  const netOut = movements.reduce((sum, m) => sum + m.amountCentavos, 0)
+  // const netOut = movements.reduce((sum, m) => sum + m.amountCentavos, 0)
+  const netOut = movements.length > 0 ? movements[0].net : 0
 
   return (
     <section className="cash-movements">

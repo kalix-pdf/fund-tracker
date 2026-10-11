@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import type { FormEvent, KeyboardEvent } from 'react'
-import { authenticate } from './Auth'
+import { authenticate } from './auth'
 import communityImage from '../../assets/community.png'
 import logo from '../../assets/logo.png'
 import '../../styles/app.css'

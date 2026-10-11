@@ -39,4 +39,5 @@ export interface CashMovement {
   purpose: string
   /** Positive = cash out, negative = cash back in (refund received). */
   amountCentavos: number
+  net: number
 }
