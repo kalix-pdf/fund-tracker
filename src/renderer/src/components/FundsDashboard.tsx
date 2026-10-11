@@ -40,8 +40,9 @@ export function FundsDashboard(): React.JSX.Element {
       {/* LEFT: month + summary + actions */}
       <aside className="funds__side">
         <label className="funds__month">
-          <span>Viewing month</span>
+          <span className="funds__month-label">Viewing month</span>
           <input
+            className="funds__month-input"
             type="month"
             value={month}
             onChange={(e) => e.target.value && setMonth(e.target.value)}

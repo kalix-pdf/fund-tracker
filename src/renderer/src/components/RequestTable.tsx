@@ -43,34 +43,29 @@ export function RequestTable(): React.JSX.Element {
       </header>
 
       <div className="cash-movements__scroll">
-        {error ? (
-          <p className="state" role="alert">
-            Failed to load requests.
-          </p>
-        ) : isLoading ? (
-          <p className="state">Loading requests…</p>
-        ) : data.length === 0 ? (
-          <p className="state">No requests found.</p>
-        ) : (
           <table className="funds__table">
             <thead>
               <tr>
-                <th>#</th>
+                <th style={{ width: '80px' }}>#</th>
                 <th>Name</th>
                 <th>Department</th>
                 <th>Purpose</th>
                 <th>Amount</th>
-                <th className='status'>Status</th>
+                <th>Status</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((r) => (
+              {data.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="empty">No requests found.</td>
+                </tr>
+              ) : (
+                data.map((r) => (
                 <tr key={r.id}>
                   <td>
                     <button type="button" className="btn-action tag--success"
-                      onClick={() => openDetails(r.id)} aria-label={`View details for ${r.requesterName}`}
-                    > View
+                      onClick={() => openDetails(r.id)} aria-label={`View details for ${r.requesterName}`}> View
                     </button>
                   </td>
                   <td>{r.requesterName}</td>
@@ -102,20 +97,20 @@ export function RequestTable(): React.JSX.Element {
                     <div className="status-cell">
                       <StatusActions request={r} onComplete={setCompleting} />
                       {/* {r.reimbursementStatus === 'PENDING' &&
-                        formatPesos(r.liquidatedCentavos ?? 0) !== formatPesos(r.amountCentavos) && (
-                          <span className="tag tag--warning">
-                            {r.liquidatedCentavos === null
-                              ? 'Not completed'
-                              : `Settlement: ${formatPesos(r.liquidatedCentavos - r.amountCentavos)}`}
-                          </span>
-                        )} */}
+      //                   formatPesos(r.liquidatedCentavos ?? 0) !== formatPesos(r.amountCentavos) && (
+      //                     <span className="tag tag--warning">
+      //                       {r.liquidatedCentavos === null
+      //                         ? 'Not completed'
+      //                         : `Settlement: ${formatPesos(r.liquidatedCentavos - r.amountCentavos)}`}
+      //                     </span>
+      //                   )} */}
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
             </tbody>
           </table>
-        )}
       </div>
 
       {selected && (
