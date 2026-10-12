@@ -17,7 +17,7 @@ extraResources:
     to: drizzle
 win:
   executableName: fund-tracker
-  icon: build/icon.ico
+  icon: build/favicon.ico
   target: nsis
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
@@ -49,4 +49,4 @@ appImage:
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://jakeAringo.com/auto-updates
