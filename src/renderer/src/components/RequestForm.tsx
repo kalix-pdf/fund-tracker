@@ -57,7 +57,7 @@ export function RequestForm({ onSubmitted }: RequestFormProps): React.JSX.Elemen
           </label>
           <input
             id={ids.name}
-            className="input"
+            className="requester_input"
             placeholder="e.g. Juan Dela Cruz"
             autoComplete="off"
             value={requesterName}
@@ -72,7 +72,7 @@ export function RequestForm({ onSubmitted }: RequestFormProps): React.JSX.Elemen
           </label>
           <select
             id={ids.department}
-            className="select"
+            className="select-requester"
             value={department}
             onChange={(e) => setDepartment(e.target.value as Department)}
           >
@@ -90,7 +90,7 @@ export function RequestForm({ onSubmitted }: RequestFormProps): React.JSX.Elemen
           </label>
           <textarea
             id={ids.purpose}
-            className="input textarea"
+            className="input textarea requester_input"
             placeholder="What is this fund for?"
             value={purpose}
             onChange={(e) => setPurpose(e.target.value)}
@@ -108,7 +108,7 @@ export function RequestForm({ onSubmitted }: RequestFormProps): React.JSX.Elemen
             </span>
             <input
               id={ids.amount}
-              className="input"
+              className="requester_input"
               type="number"
               inputMode="decimal"
               min="0"

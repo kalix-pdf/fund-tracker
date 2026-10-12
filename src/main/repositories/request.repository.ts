@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or, type SQL, count, sql } from 'drizzle-orm'
+import { and, desc, eq, like, or, type SQL, count, sql, gte, lte } from 'drizzle-orm'
 import type { Db } from '../db/client'
 import { requests } from '../db/schema'
 import type { CreateRequestInput, ListQuery } from '../../shared/schema'
@@ -24,6 +24,8 @@ export class RequestRepository {
     if (q.status) conds.push(eq(requests.status, q.status))
     if (q.department) conds.push(eq(requests.department, q.department))
     if (q.reimbursementStatus) conds.push(eq(requests.reimbursementStatus, q.reimbursementStatus))
+    if (q.minAmountCentavos !== undefined) conds.push(gte(requests.amountCentavos, q.minAmountCentavos))
+    if (q.maxAmountCentavos !== undefined) conds.push(lte(requests.amountCentavos, q.maxAmountCentavos))
     if (q.search) {
       const p = `%${q.search}%`
       conds.push(or(like(requests.requesterName, p), like(requests.purpose, p))!)
@@ -103,7 +105,8 @@ export class RequestRepository {
 
   cashOutBetween(from: Date, to: Date): number {
     const row = this.db.get<{ net: number }>(
-      sql`SELECT COALESCE(SUM(amount), 0) AS net FROM (${this.movementsSql(from, to)}) WHERE type == 'RELEASE'`
+      sql`SELECT COALESCE(SUM(amount), 0) AS net FROM (${this.movementsSql(from, to)}) WHERE type == 'RELEASE' 
+        OR type == 'REIMBURSEMENT'` 
     )
     return row?.net ?? 0
   }

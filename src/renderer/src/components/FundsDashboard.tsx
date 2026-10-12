@@ -125,11 +125,12 @@ function AddFundsForm({ onAdded }: { onAdded: () => Promise<void> }): React.JSX.
       <div className="field-row">
         <label className="field">
           <span>For month</span>
-          <input type="month" value={forMonth} onChange={(e) => setForMonth(e.target.value)} required />
+          <input type="month" className='select-requester' value={forMonth} onChange={(e) => setForMonth(e.target.value)} required />
         </label>
         <label className="field">
           <span>Amount (₱)</span>
           <input
+            className='requester_input'
             inputMode="decimal"
             placeholder="0.00"
             value={amount}
@@ -145,6 +146,7 @@ function AddFundsForm({ onAdded }: { onAdded: () => Promise<void> }): React.JSX.
         <span>Note <small>(optional)</small></span>
         <input
           value={note}
+          className='requester_input'
           maxLength={200}
           placeholder="e.g. Monthly replenishment"
           onChange={(e) => setNote(e.target.value)}

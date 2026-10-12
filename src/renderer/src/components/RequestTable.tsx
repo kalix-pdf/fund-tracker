@@ -7,6 +7,7 @@ import { StatusActions } from './StatusActions'
 import { CompleteDialog } from './CompleteDialog'
 import { StatusBadge } from './StatusBadge'
 import { RequestDetailsDrawer } from './RequestDetailsDrawer'
+import { RequestFilters } from './RequestFilters'
 
 const COLUMN_COUNT = 7
 
@@ -106,17 +107,8 @@ export function RequestTable(): React.JSX.Element {
         <span className="cash-movements__count">
           {data.length} {data.length === 1 ? 'entry' : 'entries'}
         </span>
-        <div className="toolbar">
-          <input
-            className="input"
-            type="search"
-            aria-label="Search requests"
-            placeholder="Search name or purpose"
-            onChange={(e) =>
-              setFilters((f) => ({ ...f, search: e.target.value || undefined }))
-            }
-          />
-        </div>
+
+        <RequestFilters onChange={setFilters} />
       </header>
 
       <div className="cash-movements__scroll">

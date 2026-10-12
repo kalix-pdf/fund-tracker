@@ -7,13 +7,25 @@ export const createRequestSchema = z.object({
   purpose: z.string().trim().min(1),
   amountCentavos: z.number().int().positive()
 })
-export const listQuerySchema = z.object({
-  search: z.string().trim().optional(),
-  status: z.enum(STATUSES).optional(),
-  department: z.enum(DEPARTMENTS).optional(),
-  reimbursementStatus: z.enum(['PENDING', 'PAID']).optional(),
-  refundStatus: z.enum(['PENDING', 'REFUNDED']).optional()
-})
+
+export const listQuerySchema = z
+  .object({
+    search: z.string().trim().optional(),
+    status: z.enum(STATUSES).optional(),
+    department: z.enum(DEPARTMENTS).optional(),
+    reimbursementStatus: z.enum(['PENDING', 'PAID']).optional(),
+    refundStatus: z.enum(['PENDING', 'REFUNDED']).optional(),
+    minAmountCentavos: z.number().int().nonnegative().optional(),
+    maxAmountCentavos: z.number().int().nonnegative().optional(),
+  })
+  .refine(
+    (q) =>
+      q.minAmountCentavos === undefined ||
+      q.maxAmountCentavos === undefined ||
+      q.minAmountCentavos <= q.maxAmountCentavos,
+    { message: 'Minimum amount cannot exceed maximum amount', path: ['minAmountCentavos'] },
+  )
+
 export const markReimbursedSchema = z.object({ id: z.number().int().positive() })
 export const markRefundedSchema = z.object({ id: z.number().int().positive() })
 
