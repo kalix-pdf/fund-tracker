@@ -47,7 +47,7 @@ export function Dashboard() {
         count={summary.reimbursementOwed.count}
       />
       <StatCard
-        label="Refunds to collect"
+        label="Returns to collect"
         tone="warn"
         amountCentavos={summary.refundDue.amountCentavos}
         count={summary.refundDue.count}

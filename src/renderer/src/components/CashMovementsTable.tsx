@@ -1,17 +1,40 @@
-// src/renderer/src/components/CashMovementsTable.tsx
 import type { CashMovement, CashMovementType } from '../../../shared/domain/fund'
 import { formatDateTime } from '../lib/format'
 import { formatCentavos } from '../lib/money'
+import { useMemo } from 'react'
 
 const TYPE_LABEL: Record<CashMovementType, string> = {
   RELEASE: 'Cash released',
   REIMBURSEMENT: 'Reimbursement paid',
-  REFUND: 'Refund received',
+  REFUND: 'Return received',
 }
 
 export function CashMovementsTable({ movements }: { movements: CashMovement[] }): React.JSX.Element {
   // const netOut = movements.reduce((sum, m) => sum + m.amountCentavos, 0)
-  const netOut = movements.length > 0 ? movements[0].net : 0
+  // const netOut = movements.length > 0 ? movements[0].net : 0
+
+  const totals = useMemo(() => {
+    const acc = { released: 0, reimbursed: 0, refunded: 0 }
+    for (const m of movements) {
+      switch (m.type) {
+        case 'RELEASE':
+          acc.released += m.amountCentavos
+          break
+        case 'REIMBURSEMENT':
+          acc.reimbursed += m.amountCentavos
+          break
+        case 'REFUND':
+          acc.refunded += Math.abs(m.amountCentavos)
+          break
+      }
+    }
+    return {
+      ...acc,
+      netOut: acc.released + acc.reimbursed - acc.refunded,
+    }
+  }, [movements])
+
+  const { netOut, refunded: totalRefund, reimbursed: totalReimbursed } = totals
 
   return (
     <section className="cash-movements">
@@ -62,6 +85,14 @@ export function CashMovementsTable({ movements }: { movements: CashMovement[] })
               <tr>
                 <th colSpan={5}>Net expenses</th>
                 <th className="num">{formatCentavos(netOut)}</th>
+              </tr>
+              <tr>
+                <th colSpan={5}>Total Refund:</th>
+                <th className='num'>{formatCentavos(totalRefund)}</th>
+              </tr>
+              <tr>
+                <th colSpan={5}>Total Reimbursed:</th>
+                <th className='num'>{formatCentavos(totalReimbursed)}</th>
               </tr>
             </tfoot>
           )}

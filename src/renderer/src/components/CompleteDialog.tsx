@@ -46,7 +46,7 @@ export function CompleteDialog({ request, onClose }: Props): React.JSX.Element {
         {receiptsPesos !== '' && (
           <p aria-live="polite">
             {settlement > 0 && <>Up for reimbursement: {formatPesos(settlement)}</>}
-            {settlement < 0 && <>Refund owed by requester: {formatPesos(-settlement)}</>}
+            {settlement < 0 && <>Return owed by requester: {formatPesos(-settlement)}</>}
             {settlement === 0 && <>Fully liquidated, no balance.</>}
           </p>
         )}

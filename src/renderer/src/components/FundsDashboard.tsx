@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMonthlyFunds } from '../hooks/useMonthlyFunds'
 import { currentMonthKey, nextMonthKey } from '../lib/month'
 import { formatCentavos, pesosToCentavos } from '../lib/money'
 import { CashMovementsTable } from './CashMovementsTable'
+import { summarizeMovements } from '../../../shared/domain/fund'
 import { Drawer } from './Drawer'
 import { Tabs } from './Tabs'
 
@@ -14,6 +15,7 @@ export function FundsDashboard(): React.JSX.Element {
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerTab, setDrawerTab] = useState<DrawerTab>('add')
+  const totals = useMemo(() => summarizeMovements(movements), [movements]);
 
   const openDrawer = (tab: DrawerTab) => {
     setDrawerTab(tab)
@@ -56,6 +58,8 @@ export function FundsDashboard(): React.JSX.Element {
             <Stat label="Funds added" value={summary.addedCentavos} />
             <Stat label="Cash Released" value={summary.expensesCentavos} />
             <Stat label="Total Cash Expenses" value={summary.expensesCentavos} />
+            <Stat label='Total Returned Cash' value={totals.refundedCentavos}/>
+            <Stat label='Total Reimbursed Cash' value={totals.reimbursedCentavos}/>
             <Stat label="Remaining Cash" value={summary.remainingCentavos} emphasis />
           </div>
         )}

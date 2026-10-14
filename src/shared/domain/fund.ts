@@ -41,3 +41,37 @@ export interface CashMovement {
   amountCentavos: number
   net: number
 }
+
+export interface MovementTotals {
+  releasedCentavos: number
+  reimbursedCentavos: number
+  refundedCentavos: number
+  netOutCentavos: number
+}
+
+export function summarizeMovements(movements: readonly CashMovement[]): MovementTotals {
+  let released = 0
+  let reimbursed = 0
+  let refunded = 0
+
+  for (const m of movements) {
+    switch (m.type) {
+      case 'RELEASE':
+        released += m.amountCentavos
+        break
+      case 'REIMBURSEMENT':
+        reimbursed += m.amountCentavos
+        break
+      case 'REFUND':
+        refunded += Math.abs(m.amountCentavos)
+        break
+    }
+  }
+
+  return {
+    releasedCentavos: released,
+    reimbursedCentavos: reimbursed,
+    refundedCentavos: refunded,
+    netOutCentavos: released + reimbursed - refunded,
+  }
+}
