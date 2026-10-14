@@ -76,7 +76,7 @@ export function FundsDashboard(): React.JSX.Element {
 
       {/* RIGHT: movements table */}
       <div className="funds__main">
-        <CashMovementsTable movements={movements} />
+        <CashMovementsTable key={month} month={month} movements={movements} />
       </div>
 
       <Drawer open={drawerOpen} title="Manage funds" onClose={() => setDrawerOpen(false)}>

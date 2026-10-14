@@ -1,7 +1,8 @@
+import { monthDayBounds, toLocalDateKey } from '@renderer/lib/month'
 import type { CashMovement, CashMovementType } from '../../../shared/domain/fund'
 import { formatDateTime } from '../lib/format'
 import { formatCentavos } from '../lib/money'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 const TYPE_LABEL: Record<CashMovementType, string> = {
   RELEASE: 'Cash released',
@@ -9,40 +10,52 @@ const TYPE_LABEL: Record<CashMovementType, string> = {
   REFUND: 'Return received',
 }
 
-export function CashMovementsTable({ movements }: { movements: CashMovement[] }): React.JSX.Element {
+interface Props {
+  month: string;
+  movements: CashMovement[]
+}
+
+export function CashMovementsTable({ month, movements }: Props): React.JSX.Element {
   // const netOut = movements.reduce((sum, m) => sum + m.amountCentavos, 0)
-  // const netOut = movements.length > 0 ? movements[0].net : 0
+  const [selectedDate, setSelectedDate] = useState('')
+  const { min, max } = useMemo(() => monthDayBounds(month), [month])
+  const netOut = movements.length > 0 ? movements[0].net : 0
 
-  const totals = useMemo(() => {
-    const acc = { released: 0, reimbursed: 0, refunded: 0 }
-    for (const m of movements) {
-      switch (m.type) {
-        case 'RELEASE':
-          acc.released += m.amountCentavos
-          break
-        case 'REIMBURSEMENT':
-          acc.reimbursed += m.amountCentavos
-          break
-        case 'REFUND':
-          acc.refunded += Math.abs(m.amountCentavos)
-          break
-      }
-    }
-    return {
-      ...acc,
-      netOut: acc.released + acc.reimbursed - acc.refunded,
-    }
-  }, [movements])
+  const visible = useMemo(() => selectedDate
+        ? movements.filter((m) => toLocalDateKey(m.occurredAt) === selectedDate)
+        : movements,
+    [movements, selectedDate],)
 
-  const { netOut, refunded: totalRefund, reimbursed: totalReimbursed } = totals
+  const isFiltered = selectedDate !== ''
+  const emptyMessage = isFiltered ? 'No cash movements on this date.' : 'No cash movements this month.'
 
   return (
     <section className="cash-movements">
       <header className="cash-movements__head">
         <h2 className="panel__title">Expenses &amp; cash released</h2>
-        <span className="cash-movements__count">
-          {movements.length} {movements.length === 1 ? 'entry' : 'entries'}
-        </span>
+        
+        <div className="cash-movements__tools">
+          <label className="cash-movements__filter">
+            <span className="cash-movements__filter-label">Date</span>
+            <input
+              type="date"
+              className="cash-movements__date"
+              value={selectedDate}
+              min={min}
+              max={max}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
+          </label>
+          {isFiltered && (
+            <button type="button" className="btn btn--ghost" onClick={() => setSelectedDate('')}>
+              Clear
+            </button>
+          )}
+          <span className="cash-movements__count">
+            {isFiltered ? `${visible.length} of ${movements.length}` : visible.length}{' '}
+            {movements.length === 1 ? 'entry' : 'entries'}
+          </span>
+        </div>
       </header>
 
       <div className="cash-movements__scroll">
@@ -58,12 +71,12 @@ export function CashMovementsTable({ movements }: { movements: CashMovement[] })
             </tr>
           </thead>
           <tbody>
-            {movements.length === 0 ? (
+            {visible.length === 0 ? (
               <tr>
-                <td colSpan={6} className="empty">No cash movements this month.</td>
+                <td colSpan={6} className="empty">{emptyMessage}</td>
               </tr>
             ) : (
-              movements.map((m) => (
+              visible.map((m) => (
                 <tr key={`${m.requestId}-${m.type}`}>
                   <td>{formatDateTime(m.occurredAt)}</td>
                   <td>
@@ -79,20 +92,23 @@ export function CashMovementsTable({ movements }: { movements: CashMovement[] })
                 </tr>
               ))
             )}
+            {/* {movements.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="empty">No cash movements this month.</td>
+              </tr>
+            ) : (
+              movements.map((m) => (
+                <tr key={`${m.requestId}-${m.type}`}>
+                  
+                </tr>
+              ))
+            )} */}
           </tbody>
           {movements.length > 0 && (
             <tfoot>
               <tr>
                 <th colSpan={5}>Net expenses</th>
                 <th className="num">{formatCentavos(netOut)}</th>
-              </tr>
-              <tr>
-                <th colSpan={5}>Total Refund:</th>
-                <th className='num'>{formatCentavos(totalRefund)}</th>
-              </tr>
-              <tr>
-                <th colSpan={5}>Total Reimbursed:</th>
-                <th className='num'>{formatCentavos(totalReimbursed)}</th>
               </tr>
             </tfoot>
           )}

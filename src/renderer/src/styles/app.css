@@ -1254,6 +1254,109 @@ body {
   font-size: 0.8rem;
 }
 
+.cash-movements__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cash-movements__filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Cash movements: date filter ─────────────────────────────── */
+
+.cash-movements__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cash-movements__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cash-movements__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cash-movements__filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+}
+
+.cash-movements__date {
+  height: 36px;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--text, #111827);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cash-movements__date:hover {
+  border-color: var(--border-strong, #9ca3af);
+}
+
+.cash-movements__date:focus-visible {
+  border-color: var(--accent, #2563eb);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #2563eb) 25%, transparent);
+}
+
+/* Dim the placeholder-style "mm/dd/yyyy" when no date is selected */
+.cash-movements__date:invalid,
+.cash-movements__date[value=''] {
+  color: var(--text-muted, #6b7280);
+}
+
+/* Calendar icon (Chromium/Electron) */
+.cash-movements__date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 2px;
+  border-radius: 4px;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.cash-movements__date::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: var(--hover, rgba(0, 0, 0, 0.06));
+}
+
+/* Keep the native calendar popup consistent with your theme */
+.cash-movements__date {
+  color-scheme: light; /* use "dark" if your app is dark-themed */
+}
+
+/* Clear button sizing to match the input height */
+.cash-movements__tools .btn {
+  height: 36px;
+  padding: 0 0.75rem;
+}
+
+.cash-movements__count {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #6b7280);
+  white-space: nowrap;
+}
+
 /* .select-filter { */
   /* height: 38px;
   padding: 0 12px;
